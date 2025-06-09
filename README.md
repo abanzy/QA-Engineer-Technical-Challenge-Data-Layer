@@ -18,7 +18,7 @@ This repository contains a comprehensive QA technical challenge covering:
 - `data-validation/` — SQL scripts for data validation and README
 - `reports/` — Test and validation reports (HTML, JSON)
 - `.github/workflows/qa-pipeline.yml` — CI/CD pipeline
-- `run.ps1` / `run.sh` — Root scripts for running tests (see subfolders for details)
+- `run.sh` — Root scripts for running tests (see subfolders for details)
 
 ---
 
