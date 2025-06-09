@@ -1,0 +1,21 @@
+{
+  "name": "ui-automation-playwright",
+  "version": "1.0.0",
+  "description": "UI automation test project using Playwright with a mock UI server",
+  "main": "mock_ui_server.js",
+  "scripts": {
+    "start": "node ui-automation/playwright/mock_ui_server.js",
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "typescript": "^5.4.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

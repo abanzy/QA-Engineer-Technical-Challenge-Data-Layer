@@ -1,0 +1,219 @@
+{
+  "info": {
+    "_postman_id": "d1e1b1c2-1234-5678-9abc-def012345678",
+    "name": "Transaction API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "/api/transactions",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/transactions",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "transactions"]
+        }
+      },
+      "response": [
+        {
+          "code": 200,
+          "body": "{\n  \"transactions\": [{\n    \"transaction_id\": \"abc123\",\n    \"amount\": 100,\n    \"currency\": \"USD\",\n    \"timestamp\": \"2025-06-08T12:00:00Z\"\n  }]\n}",
+          "header": [
+            {"key": "Content-Type", "value": "application/json"}
+          ]
+        },
+        {
+          "code": 400,
+          "body": "{\n  \"error\": \"Bad Request\"\n}",
+          "header": [
+            {"key": "Content-Type", "value": "application/json"}
+          ]
+        },
+        {
+          "code": 500,
+          "body": "{\n  \"error\": \"Internal Server Error\"\n}",
+          "header": [
+            {"key": "Content-Type", "value": "application/json"}
+          ]
+        }
+      ],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.expect(pm.response.code).to.equal(200);",
+              "});",
+              "if (pm.response.code === 200) {",
+              "    var jsonData = pm.response.json();",
+              "    pm.test(\"transactions array exists\", function () {",
+              "        pm.expect(jsonData.transactions).to.be.an('array');",
+              "        pm.expect(jsonData.transactions.length).to.be.above(0);",
+              "    });",
+              "    pm.test(\"transaction fields present\", function () {",
+              "        var t = jsonData.transactions[0];",
+              "        pm.expect(t).to.have.property('transaction_id');",
+              "        pm.expect(t).to.have.property('amount');",
+              "        pm.expect(t).to.have.property('currency');",
+              "        pm.expect(t).to.have.property('timestamp');",
+              "    });",
+              "    pm.test(\"amount is not negative\", function () {",
+              "        jsonData.transactions.forEach(function(t) {",
+              "            pm.expect(t.amount).to.be.at.least(0);",
+              "        });",
+              "    });",
+              "} else if (pm.response.code === 400) {",
+              "    pm.test(\"Status code is 400\", function () {",
+              "        pm.expect(pm.response.code).to.equal(400);",
+              "    });",
+              "} else if (pm.response.code === 500) {",
+              "    pm.test(\"Status code is 500\", function () {",
+              "        pm.expect(pm.response.code).to.equal(500);",
+              "    });",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "/api/transactions/:id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/transactions/abc123",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "transactions", "abc123"]
+        }
+      },
+      "response": [
+        {
+          "code": 200,
+          "body": "{\n  \"transaction_id\": \"abc123\",\n  \"amount\": 100,\n  \"currency\": \"USD\",\n  \"timestamp\": \"2025-06-08T12:00:00Z\"\n}",
+          "header": [
+            {"key": "Content-Type", "value": "application/json"}
+          ]
+        },
+        {
+          "code": 400,
+          "body": "{\n  \"error\": \"Bad Request\"\n}",
+          "header": [
+            {"key": "Content-Type", "value": "application/json"}
+          ]
+        },
+        {
+          "code": 500,
+          "body": "{\n  \"error\": \"Internal Server Error\"\n}",
+          "header": [
+            {"key": "Content-Type", "value": "application/json"}
+          ]
+        }
+      ],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.expect(pm.response.code).to.equal(200);",
+              "});",
+              "if (pm.response.code === 200) {",
+              "    var t = pm.response.json();",
+              "    pm.test(\"transaction fields present\", function () {",
+              "        pm.expect(t).to.have.property('transaction_id');",
+              "        pm.expect(t).to.have.property('amount');",
+              "        pm.expect(t).to.have.property('currency');",
+              "        pm.expect(t).to.have.property('timestamp');",
+              "    });",
+              "    pm.test(\"amount is not negative\", function () {",
+              "        pm.expect(t.amount).to.be.at.least(0);",
+              "    });",
+              "} else if (pm.response.code === 400) {",
+              "    pm.test(\"Status code is 400\", function () {",
+              "        pm.expect(pm.response.code).to.equal(400);",
+              "    });",
+              "} else if (pm.response.code === 500) {",
+              "    pm.test(\"Status code is 500\", function () {",
+              "        pm.expect(pm.response.code).to.equal(500);",
+              "    });",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "/api/transactions/delete/:id",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/transactions/delete/abc123",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "transactions", "delete", "abc123"]
+        }
+      },
+      "response": [
+        {
+          "code": 200,
+          "body": "{\n  \"success\": true\n}",
+          "header": [
+            {"key": "Content-Type", "value": "application/json"}
+          ]
+        },
+        {
+          "code": 400,
+          "body": "{\n  \"error\": \"Bad Request\"\n}",
+          "header": [
+            {"key": "Content-Type", "value": "application/json"}
+          ]
+        },
+        {
+          "code": 500,
+          "body": "{\n  \"error\": \"Internal Server Error\"\n}",
+          "header": [
+            {"key": "Content-Type", "value": "application/json"}
+          ]
+        }
+      ],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.expect(pm.response.code).to.equal(200);",
+              "});",
+              "if (pm.response.code === 200) {",
+              "    pm.test(\"Transaction deleted successfully\", function () {",
+              "        pm.expect(pm.response.json().success).to.be.true;",
+              "    });",
+              "} else if (pm.response.code === 400) {",
+              "    pm.test(\"Status code is 400\", function () {",
+              "        pm.expect(pm.response.code).to.equal(400);",
+              "    });",
+              "} else if (pm.response.code === 500) {",
+              "    pm.test(\"Status code is 500\", function () {",
+              "        pm.expect(pm.response.code).to.equal(500);",
+              "    });",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    }
+  ]
+}
