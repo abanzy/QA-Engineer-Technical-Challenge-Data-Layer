@@ -38,12 +38,6 @@ bash run.sh
   newman run api-tests.postman_collection.json -e mock-environment.json
   ```
 
-### 4. (Windows) Use PowerShell script if preferred
-From the `Project` folder:
-```powershell
-./run.ps1
-```
-
 ## Reports
 - CLI output: summary in terminal
 - HTML: `../reports/newman-report.html`
