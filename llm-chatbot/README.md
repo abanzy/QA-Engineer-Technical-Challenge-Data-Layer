@@ -1,6 +1,6 @@
 # Test Plan
 
-**Authors:** *Aaban Vasconcelos* | **Version:** 1.0 | **Last Updated:** 9 Jun 2025
+**Authors:** *Aaban Vasconcelos* | **Version:** 1.0 | **Last Updated:** 10 Jun 2025
 
 ---
 
@@ -96,7 +96,7 @@ pytest -s llm_test_script.py
 | **Structure**   | `run_chatbot_test()` key loop             | All required keys present | Guard schema drift                        |
 | **Semantics**   | `SentenceTransformer('all-MiniLM-L6-v2')` | Cos‑sim **≥ 0.4**         | Catch gross meaning errors (matches code) |
 | **LLM‑Numeric** | `llm_judge()` (1–5)                       | **≥ 4**                   | Holistic relevance/helpfulness            |
-| **Edge‑cases**  | Dedicated pytest cases                    | n/a                       | Ensure graceful errors                    |
+| **Edge‑cases**  | Dedicated pytest cases                    | Case by case assertions   | Ensure graceful errors                    |
 
 ---
 
@@ -217,7 +217,6 @@ jobs:
 
 ### Appendix A – Prompt Templates
 
-**System**
 Simplified prompt chain:
 ```text
 You are an expert assistant for evaluating chatbot responses
@@ -225,20 +224,16 @@ Given a user prompt and a chatbot's reply, rate the reply's relevance and helpfu
 Only return the number.
 ```
 
-More extensively we can add more structre for a better avaluation:
+More extensively we can add more structre for a better avaluation and finer tuning of the process:
 ```text
-You are an expert assistant for evaluating chatbot responses.
-Relevance means how well the reply stays on-topic and answers the user's question.
-Helpfulness means how useful, accurate, and actionable the reply is.
+You are an expert assistant for evaluating chatbot responses
 Given a user prompt and a chatbot's reply, rate the reply's relevance and helpfulness on a scale from 1 (poor) to 5 (excellent).
-Return the two numbers joined together as a single string, like "55" for excellent relevance and helpfulness.
-Only return the number.
+Only return the two numbers, separated by a comma, like 5,4 where 5 is the relevance score and 4 is the helpfulness score.
+Do not return any words, labels, or explanations, only the two digits separated by a comma.
 ```
 
-**User**
+**Response**
 
 ```text
-User prompt: {prompt}
-Chatbot reply: {reply}
-Score (1‑5):
+1‑5 or 1,1 to 5,5:
 ```
