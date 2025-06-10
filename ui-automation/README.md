@@ -18,14 +18,12 @@ This is a simple Express.js server that provides mock UI endpoints for QA and UI
 
 ## Usage
 
-### 1. Install dependencies
+### Install dependencies
 ```bash
 npm install express
 ```
-
-### 2. Run the server
 ```bash
-node mock_ui_server.js
+npx playwright install --with-deps
 ```
 
 ### 3. Access the UI
@@ -38,18 +36,21 @@ node mock_ui_server.js
 
 You can run the Playwright UI tests against this mock server.
 
-1. **Start the mock UI server** (see above).
+1. **Start the mock UI server**.
+```bash
+node mock_ui_server.js
+```
 2. **In a separate terminal, run:**
-   ```bash
-   npx playwright test
-   ```
+```bash
+npx playwright test
+```
    Or use the VS Code task: **Run UI Tests (Playwright)**
 
 This will execute the Playwright tests in `dashboard.spec.ts` against the running mock UI server.
 
 ## Purpose
 
-- Use this server as a mock frontend for UI automation tests (e.g., with Playwright).
+- Use this server as a mock frontend for UI automation tests with Playwright.
 - The static table is designed to match the expected structure for automated validation.
 
 ---
