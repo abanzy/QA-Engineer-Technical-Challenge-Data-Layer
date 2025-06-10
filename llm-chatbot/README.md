@@ -25,9 +25,8 @@ By using LLM-as-a-Judge, we can improve the quality of AI responses and make sur
 
 ### SBERT
 
-SBERT + cosine similarity is a system used to catch when a sentence doesn’t just sound different, it figures that it means something different.
-
-SBERT (Sentence-BERT) takes a sentence and turns it into a vector, basically a list of numbers that captures the overall meaning. These vectors aren’t about grammar or exact words, they’re about what the sentence is *trying to say*. So "I love cats" and "Cats are my favorite" might look different as text, but  but [their vectors will be pretty close](https://colab.research.google.com/drive/1Uk08dX9alrVL0Zx5-yk6WBR61OHKalO_).
+SBERT(Sentence-BERT) + cosine similarity is a system used to catch when a sentence doesn’t just sound different, it figures that it means something different.
+SBERT takes a sentence and turns it into a vector similar to the process of tokenization, basically a list of numbers that captures the overall meaning. These vectors aren’t about grammar or exact words, they’re about what the sentence is *trying to say*. So "I love cats" and "Cats are my favorite" might look different as text, but [their vectors will be pretty close in similarity](https://colab.research.google.com/drive/1Uk08dX9alrVL0Zx5-yk6WBR61OHKalO_).
 
 A vector should look similar to this:
 ```python
@@ -43,7 +42,7 @@ A vector should look similar to this:
 
 ```
 
-Once we have those vectors, cosine similarity comes in. It checks how “aligned” two vectors are, much like comparing the angle between two arrows. If the arrows point in the same direction (cosine similarity near 1), it means that the meanings are similar. If they’re way off (cosine similarity closer to 0), something’s probably wrong and the cutting line for it is not clear and it varies with each scenario.
+Once we have those vectors, cosine similarity comes in. It checks how “aligned” two vectors are, much like comparing the angle between two arrows. If the arrows point in the same direction(cosine similarity near 1), it means that the meanings are similar. If they’re way off(cosine similarity closer to 0), something is probably wrong and the cutting line for it is not exactly clear, it varies with each scenario.
 
 This combo is especially useful for detecting gross error cases where a sentence rewrite totally changes the meaning or total giggberish, for example:
 
@@ -62,19 +61,30 @@ SBERT + cosine similarity works great in grading, QA, and AI evaluation. It help
 
 ```bash
 # Clone & install
-git clone https://github.com/your-org/myproject.git
-cd myproject
+git clone https://github.com/abanzy/QA-Engineer-Technical-Challenge-Data-Layer.git
+cd llm-chatbot
 pip install openai, sentence-transformers, pytest, requests
-
-# Keys
-export OPENAI_API_KEY="<your key>"
+```
+```bash
+# Set the API key in llm_test_script.py
+openai.api_key = ""
 ```
 
-*Optional*: disable pytest noise:
+```bash
+# Run mock_chatbot_api.py to have a mocked chatbot serveer
+ python mock_chatbot_api.py
 
-```ini
-[pytest]
-addopts = -q --maxfail=1 --disable-warnings
+# Or use nohup for a detached 
+nohup python mock_chatbot_api.py
+
+```
+
+```bash
+# Run pytest
+pytest llm_test_script.py
+
+# Or add a -s flag for verbose in the logs
+pytest -s llm_test_script.py
 ```
 
 ---
@@ -102,11 +112,9 @@ Numeric fields (e.g. `totalAmount`) must match exactly when present.
 
 ---
 
-## 4 Example Helper Function
+## 4 Example Helper Function using SBERT to lock in key words and validate semantics
 
 ```python
-from myproject.tests import run_chatbot_test
-
 # Happy‑path check
 run_chatbot_test(
     prompt="Show me my last 5 transactions.",
@@ -118,8 +126,8 @@ run_chatbot_test(
 *Output*
 
 ```text
-Prompt: Show me my last 5 transactions.
-Response: Here are your 5 most recent transactions...
+Prompt: "Show me my last 5 transactions."
+Response: "Here are your 5 most recent transactions..."
 SBERT similarity: 0.87
 LLM judge score: 4
 PASS
@@ -136,12 +144,6 @@ PASS
 | `test_llm_invalid_location`    | Out‑of‑domain prompt should trigger `error` |
 | `test_llm_last_transaction`    | Single‑item fetch                           |
 | `test_llm_total_amount`        | Numeric aggregation check                   |
-
-Run all with:
-
-```bash
-pytest -q
-```
 
 ---
 
@@ -164,7 +166,7 @@ pytest -q
 
 ---
 
-## 8 Why LLM‑as‑a‑Judge in *myproject*?
+## 8 Why should i use LLM‑as‑a‑Judge in *my project*?
 
 * **Cheap but reliable** – numeric rubric gives binary pass/fail via `>=4` rule.
 * **Fast** – \~100 ms cloud latency; local SBERT adds < 10 ms.
@@ -175,7 +177,7 @@ Limitations: token cost, prompt sensitivity; mitigated with deterministic `tempe
 
 ---
 
-## 9 CI Hook
+## 9 CI Hook example
 
 ```yaml
 # .github/workflows/llm-tests.yml
@@ -190,7 +192,7 @@ jobs:
         with:
           python-version: 3.11
       - run: pip install -r requirements.txt
-      - run: pytest -q
+      - run: pytest -s llm_test_script.py
 ```
 
 ---
@@ -203,7 +205,7 @@ jobs:
    3. Department of Civil and Environmental Engineering, Imperial College London, UK  
    4. Gaoling School of Artificial Intelligence, Renmin University of China, China
 
-2. Anadkat, S. (2024, October). *Custom LLM as a Judge to Detect Hallucinations with Braintrust.* GitHub Cookbook. [Link to GitHub](https://github.com)  
+2. Anadkat, S. (2024, October). *Custom LLM as a Judge to Detect Hallucinations with Braintrust.* [GitHub Cookbook.](https://cookbook.openai.com/examples/custom-llm-as-a-judge)  
    Shyamal Anadkat (OpenAI).
 
 3. Reimers, N., & Gurevych, I. (2019). *Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks.* [arXiv:1908.10084](https://doi.org/10.48550/arXiv.1908.10084). Published at EMNLP 2019.  
@@ -216,9 +218,21 @@ jobs:
 ### Appendix A – Prompt Templates
 
 **System**
-
+Simplified prompt chain:
 ```text
-You are an expert assistant for evaluating chatbot responses…
+You are an expert assistant for evaluating chatbot responses
+Given a user prompt and a chatbot's reply, rate the reply's relevance and helpfulness on a scale from 1 (poor) to 5 (excellent).
+Only return the number.
+```
+
+More extensively we can add more structre for a better avaluation:
+```text
+You are an expert assistant for evaluating chatbot responses.
+Relevance means how well the reply stays on-topic and answers the user's question.
+Helpfulness means how useful, accurate, and actionable the reply is.
+Given a user prompt and a chatbot's reply, rate the reply's relevance and helpfulness on a scale from 1 (poor) to 5 (excellent).
+Return the two numbers joined together as a single string, like "55" for excellent relevance and helpfulness.
+Only return the number.
 ```
 
 **User**
